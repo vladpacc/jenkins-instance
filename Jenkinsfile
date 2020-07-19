@@ -58,7 +58,10 @@ def slavePodTemplate = """
             git 'https://github.com/vladpacc/jenkins-instance.git'
         }
         stage("Generate Variables") {
+            dir("deployments/terraform")
+
             println("Generate Variables")
+            def deployment_configuration
         }
         container("buildtools") {
             dir('deployments/terraform') {
