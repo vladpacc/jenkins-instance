@@ -86,7 +86,7 @@ properties([
                                     #!/bin/bash
                                     export AWS_DEFAULT_REGION=${aws_region}
                                     terraform init
-                                    terraform plan -auto-approve
+                                    terraform plan
                                     """
                             }
                         }
@@ -101,7 +101,7 @@ properties([
                         #!/bin/bash
                         export AWS_DEFAULT_REGION=${aws_region}
                         terraform init
-                        terraform destroy -auto-approve
+                        terraform destroy
                         """
                     } else { 
                         println("Skipping the destroy")
