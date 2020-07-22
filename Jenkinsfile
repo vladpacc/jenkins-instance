@@ -61,8 +61,8 @@ def slavePodTemplate = """
         }
         container("buildtools") {
             dir('deployments/terraform') {
-                withCredentials([usernamePassword(credentialsId: 'packer-build-creds', 
-                    passwordVariable: 'AWS_SECRET_ACCESS_KEY', usernameVariable: 'AWS_ACCESS_KEY_ID')]) {
+              withCredentials([usernamePassword(credentialsId: 'AKIAJXQC46ONZ5ASSZZA', 
+              passwordVariable: 'AWS_SECRET_ACCESS_KEY', usernameVariable: 'AWS_ACCESS_KEY_ID')]) {
                     stage("Terraform Apply/plan") {
                         if (!params.terraformDestroy) {
                             if (params.terraformApply) {
@@ -97,7 +97,7 @@ def slavePodTemplate = """
                             println("Skiping the destroy")
                         }
                     }
-                }
+              }
             }
         }
       }
