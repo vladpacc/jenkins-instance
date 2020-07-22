@@ -77,16 +77,16 @@ properties([
                                     sh """
                                     #!/bin/bash
                                     export AWS_DEFAULT_REGION=${aws_region}
-                                    source set-env.sh dev.tfvars
-                                    terraform apply dev.tfvars
+                                    terraform init
+                                    terraform apply -auto-approve
                                     """
                                 } else {
                                     println("Applying the changes")
                                     sh """
                                     #!/bin/bash
                                     export AWS_DEFAULT_REGION=${aws_region}
-                                    source set-env.sh dev.tfvars
-                                    terraform plan
+                                    terraform init
+                                    terraform plan -auto-approve
                                     """
                             }
                         }
@@ -100,8 +100,8 @@ properties([
                         sh """
                         #!/bin/bash
                         export AWS_DEFAULT_REGION=${aws_region}
-                        source set-env.sh dev.tfvars
-                        terraform destroy
+                        terraform init
+                        terraform destroy -auto-approve
                         """
                     } else { 
                         println("Skipping the destroy")
