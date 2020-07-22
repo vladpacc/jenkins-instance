@@ -1,4 +1,3 @@
- 
 def k8slabel = "jenkins-pipeline-${UUID.randomUUID().toString()}"
 def slavePodTemplate = """
       metadata:
@@ -18,7 +17,7 @@ def slavePodTemplate = """
                   - jenkins-jenkins-master
               topologyKey: "kubernetes.io/hostname"
         containers:
-        - name: fuchicorp
+        - name: buildtools
           image: fuchicorp/buildtools
           imagePullPolicy: IfNotPresent
           command:
@@ -45,68 +44,61 @@ def slavePodTemplate = """
             hostPath:
               path: /var/run/docker.sock
     """
-
-properties([
-    parameters([
-        booleanParam(defaultValue: false, description: 'please select to apply the changes', name: 'terraformAPPLY'),
-        booleanParam(defaultValue: false, description: 'please select to destrot all', name: 'terraformDestroy'),
-        choice(choices: ['us-west-2', 'us-west-1', 'us-east-1', 'us-east-2', 'eu-west-1'], description: 'Please select the region', name: 'aws_region')
+    properties([
+        parameters([
+            booleanParam(defaultValue: false, description: 'Please select to apply the changes ', name: 'terraformApply'),
+            booleanParam(defaultValue: false, description: 'Please select to destroy all ', name: 'terraformDestroy'), 
+            choice(choices: ['us-west-2', 'us-west-1', 'us-east-2', 'us-east-1', 'eu-west-1'], description: 'Please select the region', name: 'aws_region')
         ])
-        ])
-
-
+    ])
     podTemplate(name: k8slabel, label: k8slabel, yaml: slavePodTemplate, showRawYaml: false) {
       node(k8slabel) {
-
         stage("Pull SCM") {
             git 'https://github.com/vladpacc/jenkins-instance.git'
         }
-        
         stage("Generate Variables") {
             println("Generate Variables")
         }
-        
-                    container("buildtools") {
-                        dir('deployments/terraform') {
-                            withCredentials([usernamePassword(credentialsId: 'packer-build-creds', 
-                            passwordVariable: 'AWS_SECRET_ACCESS_KEY', usernameVariable: 'AWS_ACCESS_KEY_ID')]) {
-                            stage("Terraform Apply/plan") {
-                                if (!terraformDestroy){
-                                if(params.TerraformApply) {
-                                    println("Planning the changes")
-                                    sh """
-                                    #!/bin/bash
-                                    export AWS_DEFAULT_REGION=${aws_region}
-                                    terraform init
-                                    terraform apply -auto-approve
-                                    """
-                                } else {
-                                    println("Applying the changes")
-                                    sh """
-                                    #!/bin/bash
-                                    export AWS_DEFAULT_REGION=${aws_region}
-                                    terraform init
-                                    terraform plan -auto-approve
-                                    """
+        container("buildtools") {
+            dir('deployments/terraform') {
+                withCredentials([usernamePassword(credentialsId: 'packer-build-creds', 
+                    passwordVariable: 'AWS_SECRET_ACCESS_KEY', usernameVariable: 'AWS_ACCESS_KEY_ID')]) {
+                    stage("Terraform Apply/plan") {
+                        if (!params.terraformDestroy) {
+                            if (params.terraformApply) {
+                                println("Applying the changes")
+                                sh """
+                                #!/bin/bash
+                                export AWS_DEFAULT_REGION=${aws_region}
+                                terraform init
+                                terraform apply -auto-approve 
+                                """
+                            } else {
+                                println("Planing the changes")
+                                sh """
+                                #!/bin/bash
+                                export AWS_DEFAULT_REGION=${aws_region}
+                                terraform init
+                                terraform plan -auto-approve 
+                                """
                             }
                         }
                     }
-         }
-    }
-       
-                stage("Terraform Destroy") {
-                    if (params.terraformDestroy) {
-                        println("Destroying the all")
-                        sh """
-                        #!/bin/bash
-                        export AWS_DEFAULT_REGION=${aws_region}
-                        terraform init
-                        terraform destroy -auto-approve
-                        """
-                    } else { 
-                        println("Skipping the destroy")
+                    stage("Terraform Destroy") {
+                        if (params.terraformDestroy) {
+                            println("Destroying the all")
+                            sh """
+                            #!/bin/bash
+                            export AWS_DEFAULT_REGION=${aws_region}
+                            terraform init
+                            terraform destroy -auto-approve 
+                            """
+                        } else {
+                            println("Skiping the destroy")
                         }
-                    } 
-         }         
+                    }
+                }
+            }
         }
       }
+    }
