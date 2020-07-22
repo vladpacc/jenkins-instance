@@ -48,27 +48,40 @@ def slavePodTemplate = """
         parameters([
             booleanParam(defaultValue: false, description: 'Please select to apply the changes ', name: 'terraformApply'),
             booleanParam(defaultValue: false, description: 'Please select to destroy all ', name: 'terraformDestroy'), 
-            choice(choices: ['us-west-2', 'us-west-1', 'us-east-2', 'us-east-1', 'eu-west-1'], description: 'Please select the region', name: 'aws_region')
+            choice(choices: ['us-west-2', 'us-west-1', 'us-east-2', 'us-east-1', 'eu-west-1'], description: 'Please select the region', name: 'aws_region'),
+            choice(choices: ['dev', 'qa', 'stage', 'prod'], description: '', name: 'environment')
         ])
     ])
+
+
+
     podTemplate(name: k8slabel, label: k8slabel, yaml: slavePodTemplate, showRawYaml: false) {
       node(k8slabel) {
+
         stage("Pull SCM") {
            git 'https://github.com/vladpacc/jenkins-instance.git'
         }
         stage("Generate Variables") {
+            dir('deployments/terraform') {
             println("Generate Variables")
+            def deployment_configuratuion_tfvars = """
+            environment = '${params.environment}'
+            """.stripIndent()
+
+            
         }
+        }
+      
+
+
         container("buildtools") {
             dir('deployments/terraform') {
-              withCredentials([
-                usernamePassword(credentialsId: 'AWS_ACCESS_KEY_ID', 
+              withCredentials([usernamePassword(credentialsId:'aws-access-${environment}', 
                 passwordVariable: 'AWS_SECRET_ACCESS_KEY', usernameVariable: 'AWS_ACCESS_KEY_ID')]) {
-   
-         
-                    stage("Terraform Apply/plan") {
-                        if (!params.terraformDestroy) {
-                            if (params.terraformApply) {
+                println("Selected cred is: aws-access-${environment}")
+                stage("Terraform Apply/plan") {
+                    if (!params.terraformDestroy) {
+                        if (params.terraformApply) {
                                 println("Applying the changes")
                                 sh """
                                 #!/bin/bash
@@ -99,9 +112,7 @@ def slavePodTemplate = """
                         } else {
                             println("Skiping the destroy")
                         }
-                  
-                  }
-                }
+                    }
               }
             }
         }
