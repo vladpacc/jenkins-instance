@@ -54,7 +54,7 @@ def slavePodTemplate = """
     podTemplate(name: k8slabel, label: k8slabel, yaml: slavePodTemplate, showRawYaml: false) {
       node(k8slabel) {
         stage("Pull SCM") {
-            git 'https://github.com/vladpacc/jenkins-instance.git'
+           git 'https://github.com/vladpacc/jenkins-instance.git'
         }
         stage("Generate Variables") {
             println("Generate Variables")
