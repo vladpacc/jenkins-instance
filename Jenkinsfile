@@ -78,7 +78,7 @@ properties([
                                     #!/bin/bash
                                     export AWS_DEFAULT_REGION=${aws_region}
                                     source set-env.sh dev.tfvars
-                                    terraform apply -auto-approve
+                                    terraform apply dev.tfvars
                                     """
                                 } else {
                                     println("Applying the changes")
