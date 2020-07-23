@@ -61,11 +61,9 @@ def slavePodTemplate = """
         }
         container("buildtools") {
             dir('deployments/terraform') {
-              withCredentials([
-                usernamePassword(credentialsId: 'AWS_ACCESS_KEY_ID', 
+              withCredentials([usernamePassword(credentialsId: "aws-access-${environment}", 
                 passwordVariable: 'AWS_SECRET_ACCESS_KEY', usernameVariable: 'AWS_ACCESS_KEY_ID')]) {
-   
-         
+                    println("Selected cred is: aws-access-${environment}")
                     stage("Terraform Apply/plan") {
                         if (!params.terraformDestroy) {
                             if (params.terraformApply) {
@@ -80,6 +78,8 @@ def slavePodTemplate = """
                                 println("Planing the changes")
                                 sh """
                                 #!/bin/bash
+                                set +ex
+                                ls -l
                                 export AWS_DEFAULT_REGION=${aws_region}
                                 source ./set-env.sh dev.tfvars
                                 terraform plan
