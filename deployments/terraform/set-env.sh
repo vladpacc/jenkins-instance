@@ -1,19 +1,17 @@
 #!/bin/bash
-# echo $0
-set +ex 
-# if [ "$0" = "$BASH_SOURCE" ]
-# then
-#    echo "$0: Please source this file."
-#    echo "e.g. source ./setenv configurations/data-rnd-us-vet1-v1"
-#    return 1
-# fi
+if [ "$0" = "$BASH_SOURCE" ]
+then
+   echo "$0: Please source this file."
+   echo "e.g. source ./setenv configurations/data-rnd-us-vet1-v1"
+   return 1
+fi
+
 if [ -z "$1" ]
 then
    echo "setenv: You must provide the name of the configuration file."
    echo "e.g. source ./setenv configurations/data-rnd-us-vet1-v1"
    return 1
 fi
-echo "one "
 # Get directory we are running from
 DIR=$(pwd)
 DATAFILE="$DIR/$1"
@@ -21,7 +19,6 @@ if [ ! -f "$DATAFILE" ]; then
     echo "setenv: Configuration file not found: $DATAFILE"
     return 1
 fi
-echo "one two"
 # Get env from DATAFILE
 ENVIRONMENT=$(sed -nr 's/^\s*environment\s*=\s*"([^"]*)".*$/\1/p' "$DATAFILE")
 S3BUCKET=$(sed -nr 's/^\s*s3_bucket\s*=\s*"([^"]*)".*$/\1/p' "$DATAFILE")
@@ -34,13 +31,14 @@ then
    echo "setenv: 'environment' variable not set in configuration file."
    return 1
 fi
-echo "one three"
+
 if [ -z "$S3BUCKET" ]
 then
    echo "setenv: 's3_bucket' variable not set in configuration file."
    return 1
 fi
-echo "one fourth"
+
+
 if [ -z "$S3BUCKETPROJ" ]
 then
   echo "setenv: 's3_folder_project' variable not set in configuration file."
@@ -51,7 +49,7 @@ then
    echo "setenv: 's3_folder_region' variable not set in configuration file."
    return 1
 fi
-echo "one five"
+
 if [ -z "$S3BUCKETTYPE" ]
 then
    echo "setenv: 's3_folder_type' variable not set in configuration file."
@@ -63,7 +61,7 @@ then
    echo "e.g. s3_tfstate_file=\"infrastructure.tfstate\""
 return 1
 fi
-echo "one six"
+
 cat << EOF > "$DIR/backend.tf"
 terraform {
     backend "s3" {
