@@ -1,3 +1,4 @@
+  
 def k8slabel = "jenkins-pipeline-${UUID.randomUUID().toString()}"
 
 def slavePodTemplate = """
@@ -88,7 +89,7 @@ def slavePodTemplate = """
                                 sh """
                                 #!/bin/bash
                                 export AWS_DEFAULT_REGION=${aws_region}
-                                terraform init
+                                source ./setenv.sh dev.tfvars
                                 terraform apply -auto-approve -var-file \$DATAFILE
                                 """
                             } else {
@@ -98,7 +99,7 @@ def slavePodTemplate = """
                                 set +ex
                                 ls -l
                                 export AWS_DEFAULT_REGION=${aws_region}
-                                terraform init
+                                source ./setenv.sh dev.tfvars
                                 terraform plan -var-file \$DATAFILE
                                 """
                             }
@@ -111,7 +112,7 @@ def slavePodTemplate = """
                             sh """
                             #!/bin/bash
                             export AWS_DEFAULT_REGION=${aws_region}
-                            terraform init
+                            source ./setenv.sh dev.tfvars
                             terraform destroy -auto-approve -var-file \$DATAFILE
                             """
                         } else {
