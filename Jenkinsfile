@@ -64,7 +64,7 @@ def slavePodTemplate = """
             environment = "${environment}"
             """.stripIndent()
             writeFile file: 'deployment_configuration.tfvars', text: "${deployment_configuration_tfvars}"
-            sh 'cat deployment_configuration.tfvars && ls -l '
+            sh 'cat deployment_configuration.tfvars >> dev.tfvars'
 
             }
         }
@@ -81,7 +81,7 @@ def slavePodTemplate = """
                                 #!/bin/bash
                                 export AWS_DEFAULT_REGION=${aws_region}
                                 source ./set-env.sh dev.tfvars
-                                terraform apply -auto-approve 
+                                terraform apply -auto-approve  -var-file \$DATAFILE
                                 """
                             } else {
                                 println("Planing the changes")
@@ -91,7 +91,7 @@ def slavePodTemplate = """
                                 ls -l
                                 export AWS_DEFAULT_REGION=${aws_region}
                                 source ./set-env.sh dev.tfvars
-                                terraform plan
+                                terraform plan -var-file \$DATAFILE
                                 """
                             }
                         }
@@ -103,7 +103,7 @@ def slavePodTemplate = """
                             #!/bin/bash
                             export AWS_DEFAULT_REGION=${aws_region}
                             source ./set-env.sh dev.tfvars
-                            terraform destroy -auto-approve 
+                            terraform destroy -auto-approve -var-file \$DATAFILE
                             """
                         } else {
                             println("Skiping the destroy")
