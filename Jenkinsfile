@@ -54,7 +54,8 @@ def slavePodTemplate = """
             choice(choices: ['us-west-2', 'us-west-1', 'us-east-2', 'us-east-1', 'eu-west-1'], description: 'Please select the region', name: 'aws_region'),
             choice(choices: ['dev', 'qa', 'stage', 'prod'], description: 'Please select the environment to deploy.', name: 'environment'),
             string(defaultValue: 'ami-012142d0d2c50938c', description: 'please choose the AMI ID', name: 'instance_ami_id', trim: false),
-            string(defaultValue: 'jenkinsfile', description: 'please choose the instance name', name: 'instance_name', trim: false)
+            string(defaultValue: 'jenkinsfile', description: 'please choose the instance name', name: 'instance_name', trim: false),
+            choice(choices: ['DEBUG', 'TRACE', 'ERROR', 'INFO', 'WARN'], description: 'SELECT THE LOGS MODE PLEASE', name: 'TF_LOG')
         ])
     ])
 
@@ -95,6 +96,7 @@ def slavePodTemplate = """
                                 export AWS_DEFAULT_REGION=${aws_region}
                                 source ./setenv.sh dev.tfvars
                                 terraform apply -auto-approve -var-file \$DATAFILE
+                                export TF_LOG=${TF_LOG}
                                 """
                             } else {
                                 println("Planing the changes")
@@ -105,6 +107,7 @@ def slavePodTemplate = """
                                 export AWS_DEFAULT_REGION=${aws_region}
                                 source ./setenv.sh dev.tfvars
                                 terraform plan -var-file \$DATAFILE
+                                export TF_LOG=${TF_LOG}
                                 """
                             }
                         }
@@ -118,13 +121,13 @@ def slavePodTemplate = """
                             export AWS_DEFAULT_REGION=${aws_region}
                             source ./setenv.sh dev.tfvars
                             terraform destroy -auto-approve -var-file \$DATAFILE
+                            export TF_LOG=${TF_LOG}
                             """
                         } else {
                             println("Skiping the destroy")
                         }
                     }
                 }
-
             }
         }
       }
