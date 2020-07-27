@@ -10,4 +10,3 @@ resource "aws_instance" "jenkins" {
 
 variable "instance_ami_id" {}
 variable "instance_name" {}
-variable "debbug_mode" {}
