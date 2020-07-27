@@ -8,5 +8,5 @@ resource "aws_instance" "jenkins" {
 }
 
 
-variable "Instance_AMI_ID" {}
-variable "Instance_name" {}
+variable "instance_ami_id" {}
+variable "instance_name" {}
