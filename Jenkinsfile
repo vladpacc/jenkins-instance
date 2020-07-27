@@ -53,7 +53,7 @@ def slavePodTemplate = """
             booleanParam(defaultValue: false, description: 'Please select to destroy all ', name: 'terraformDestroy'), 
             choice(choices: ['us-west-2', 'us-west-1', 'us-east-2', 'us-east-1', 'eu-west-1'], description: 'Please select the region', name: 'aws_region'),
             choice(choices: ['dev', 'qa', 'stage', 'prod'], description: 'Please select the environment to deploy.', name: 'environment'),
-            string(defaultValue: 'ami-012142d0d2c50938c', description: 'please choose the AMI ID', name: 'Instance_AMI_ID', trim: false)
+            string(defaultValue: 'ami-012142d0d2c50938c', description: 'please choose the AMI ID', name: 'Instance_AMI_ID', trim: false),
             string(defaultValue: 'jenkinsfile', description: 'please choose the instance name', name: 'Instance_name', trim: false)
         ])
     ])
